@@ -18,7 +18,7 @@ const synth = new Tone.Synth({
     attack: 0.1,
     decay: 0.2,
     sustain: 1.0,
-    release: 0.8
+    release: 0.3
   },
   volume: -20 // Set the desired amplitude level in decibels
 }).toDestination();
@@ -28,17 +28,18 @@ const playButton = document.getElementById("playButton");
 playButton.addEventListener("click", playSound);
 
 function playSound() {
-  synth.triggerAttackRelease("C4", "4n");
+  synth.triggerAttackRelease("C4", "8n");
 }
 
 let lastVideoTime = -1;
+let state = [];
 let lastState = [];
 const canvas = document.querySelector("#video-container canvas");
 
 export async function predictWebcam(video, gestureRecognizer, ctx) {
     let nowInMs = Date.now();
     let results;
-    let state = [];
+    state = [];
     if (video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         results = gestureRecognizer.recognizeForVideo(video, nowInMs);
@@ -50,14 +51,18 @@ export async function predictWebcam(video, gestureRecognizer, ctx) {
             }
             let hand1 = state[0];
             synth.volume.value = hand1[1]['y']*-20;
+            //synth.envelope.attack = hand1[1]['x']*0.1;
+            //synth.envelope.release = hand1[1]['x']*0.4;
+
             let muted_gestures = ['None', 'Closed_Fist'];
             console.log(hand1[0]);
             console.log(muted_gestures.includes(hand1[0]));
             if (!(muted_gestures.includes(hand1[0]))) {
-                if (lastState.length > 0 && muted_gestures.includes(lastState[0][0])) {
-                    console.log("play");
-                    playSound();
-                }
+                //if (lastState.length > 0 && muted_gestures.includes(lastState[0][0])) {
+                //    console.log("play");
+                //    playSound();
+                //}
+                playSound();
             }
         }
         lastState = state;
