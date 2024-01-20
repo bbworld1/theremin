@@ -1,20 +1,66 @@
+
+import * as Tone from 'tone'
+
 import {
     GestureRecognizer,
     DrawingUtils
 } from '@mediapipe/tasks-vision';
 
+
+Tone.start();
+
+// Create a simple synth with set amplitude
+const synth = new Tone.Synth({
+  oscillator: {
+    type: "sine" // You can change the oscillator type (sine, square, sawtooth, triangle)
+  },
+  envelope: {
+    attack: 0.1,
+    decay: 0.2,
+    sustain: 1.0,
+    release: 0.8
+  },
+  volume: -20 // Set the desired amplitude level in decibels
+}).toDestination();
+
+// Attach click event listener to the button
+const playButton = document.getElementById("playButton");
+playButton.addEventListener("click", playSound);
+
+function playSound() {
+  synth.triggerAttackRelease("C4", "4n");
+}
+
 let lastVideoTime = -1;
+let lastState = [];
 const canvas = document.querySelector("#video-container canvas");
 
 export async function predictWebcam(video, gestureRecognizer, ctx) {
     let nowInMs = Date.now();
     let results;
+    let state = [];
     if (video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         results = gestureRecognizer.recognizeForVideo(video, nowInMs);
         if (results.landmarks.length > 0) {
-            console.log(results.landmarks[0][0]);
+            for (let i = 0; i < results.landmarks.length; i++) {
+                state.push([results.gestures[i][0].categoryName, results.landmarks[i][0]]);
+                //console.log("hand " + i + " | " + results.gestures[i][0].categoryName);
+                //console.log(results.landmarks[i][0]);
+            }
+            let hand1 = state[0];
+            synth.volume.value = hand1[1]['y']*-20;
+            let muted_gestures = ['None', 'Closed_Fist'];
+            console.log(hand1[0]);
+            console.log(muted_gestures.includes(hand1[0]));
+            if (!(muted_gestures.includes(hand1[0]))) {
+                if (lastState.length > 0 && muted_gestures.includes(lastState[0][0])) {
+                    console.log("play");
+                    playSound();
+                }
+            }
         }
+        lastState = state;
     }
     if (results?.landmarks) {
         ctx.save();

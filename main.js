@@ -1,3 +1,6 @@
+
+import * as Tone from 'tone'
+
 import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
@@ -31,6 +34,7 @@ window.onload = async () => {
   const ctx = canvas.getContext("2d");
   await askWebcamPermissions();
   await captureCamera(video);
+  //await Tone.start();
   video.addEventListener("loadeddata", () => predictWebcam(video, gestureRecognizer, ctx));
 }
 
