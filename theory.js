@@ -3,7 +3,7 @@ import * as teoria from 'teoria';
 let X_MIN = 1 - 0.10;
 let X_MAX = 1 - 0.45;
 let Y_MIN = 0.20;
-let Y_MAX = 0.80;
+let Y_MAX = 0.91;
 
 let grid = [];
 
